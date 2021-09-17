@@ -146,10 +146,10 @@ function generateSettingsContainer(): [SettingsContainer, (playState: PlayState)
             sensitivity: 0.5,
             contrast: 0.5,
             zoom: 4,
-            minFrequency: 10,
-            maxFrequency: 12000,
+            minFrequency: 50,
+            maxFrequency: 7000,
             scale: 'mel' as Scale,
-            gradient: 'Heated Metal',
+            gradient: 'Black to White',
         });
 
         const classes = useStyles();
@@ -208,6 +208,30 @@ function generateSettingsContainer(): [SettingsContainer, (playState: PlayState)
         const onStopClick = useCallback(() => {
             onStop();
             setPlayState('stopped');
+
+            // document.getElementById('spectro_view').toBlob(function(blob) {
+            //     saveAs(blob, "image.png");
+            // });
+
+            let canvasImage = document.getElementById('spectro_view').toDataURL('image/png');
+    
+            console.log(canvasImage)
+
+            // this can be used to download any image from webpage to local disk
+            let xhr = new XMLHttpRequest();
+            xhr.responseType = 'blob';
+            xhr.onload = function () {
+                let a = document.createElement('a');
+                a.href = window.URL.createObjectURL(xhr.response);
+                a.download = 'image_name.png';
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+              };
+              xhr.open('GET', canvasImage); // This is to download the canvas Image
+              xhr.send();
+
         }, [setPlayState]);
         const onSensitivityChange = useCallback(
             (value: number) => {
@@ -345,6 +369,20 @@ function generateSettingsContainer(): [SettingsContainer, (playState: PlayState)
                 >
                     Stop
                 </Button>
+
+                <Divider className={classes.divider} />
+
+                <div className={classes.buttonContainer}>
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        onMouseDown={onPlayMicrophoneClick}
+                        onMouseUp={onStopClick}
+                    >
+                        Record
+                    </Button>
+                </div>
 
                 <Divider className={classes.divider} />
 
